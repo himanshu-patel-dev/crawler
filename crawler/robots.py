@@ -11,6 +11,7 @@ last_fetch = {}
 USER_AGENT = "MyCrawlerBot/1.0 (+https://example.com/bot)"
 
 def can_fetch(url):
+    """Check if the URL can be fetched according to robots.txt"""
     domain = urlparse(url).netloc
     if domain not in robots_cache:
         rp = RobotFileParser()

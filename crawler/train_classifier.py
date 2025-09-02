@@ -1,3 +1,5 @@
+""" page type classifier training script """
+
 # train_classifier.py
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer

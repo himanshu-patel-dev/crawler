@@ -1,23 +1,11 @@
 # crawler
 a simple web crawler
 
-how to use
-- Start server, `python3 manage.py runserver`
-- Post URL and crawler will crawl the page and store it in DB and return in API response
+## How to insert URLs from Django shell
 
-
-## API Contract
-
-### Insert a new URL to crawl
-POST `http://127.0.0.1:8000/api/crawl`
-```curl
-$ curl -X POST http://127.0.0.1:8000/api/crawl/ \
-     -H "Content-Type: application/json" \
-     -d '{"url":"https://www.cnn.com/2013/06/10/politics/edward-snowden-profile/"}'
-
-{"url":"https://www.cnn.com/2013/06/10/politics/edward-snowden-profile/","title":"Man behind NSA leaks says he did it to safeguard privacy, liberty | CNN Politics","description":"Edward Snowden might never live in the U.S. as a free man again after leaking secrets about a U.S. surveillance program","body":"Unclear where Snowden will wind up, after leaving Hong Kong for Russia Edward Snowden, 29, is the source of leaks over an NSA surveillance program \"The public needs to decide whether these programs ... are right or wrong,\" he says He’s a high school dropout who worked his way into the most secretive...","created_at":"2025-09-01T15:02:49.384606Z","updated_at":"2025-09-01T15:02:49.384638Z"}
+```bash
+python3 manage.py shell
 ```
-
 ```python
 from crawler.models import URLRecord
 
@@ -25,6 +13,8 @@ URLRecord.objects.create(url="http://www.amazon.com/Cuisinart-CPT-122-Compact-2-
 URLRecord.objects.create(url="http://blog.rei.com/camp/how-to-introduce-your-indoorsy-friend-to-the-outdoors/")
 URLRecord.objects.create(url="http://www.cnn.com/2013/06/10/politics/edward-snowden-profile/")
 ```
+
+## Manually run workers to queue URLs or clean dead/stuck URLs
 
 ```bash
 # pick urls in 'queued' or 'failed' with <5 reties and push them to queue
@@ -43,6 +33,27 @@ celery -A crawler_service flower --port=5555
 
 ```
 
+## Links
+
+#### API Endpoints
+- `http://127.0.0.1:8000/api/urls/` - post new URL and this will be picked up by dispatcher
+
+![URL POST API](images/url_post_api.png)
+
+- `http://127.0.0.1:8000/api/urls/list/` - show all URLs along with their status
+
+![URL GET API](images/url_get_api.png)
+
+- `http://localhost:5555/` - dashboard for celery task workers
+
+![Celery Dashboard](images/celery_dashboard.png)
+
+- `http://127.0.0.1:8000/admin/` - admin dashboard
+
+![Admin Dashboard](images/admin_dashboard.png)
+
+- `http://127.0.0.1:8000/admin/crawler/page/5/change/` - admin page to view crawled page
+![alt text](images/crawled_page.png)
 
 ## ToDo
 - Check query access patterns and Indexes

@@ -10,6 +10,7 @@ USER_AGENT = "MyCrawlerBot/1.0 (+https://example.com/bot)"
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=True, max_retries=3)
 def fetch_url_task(self, url_id, url):
+    """Fetch the URL, extract content, classify and store in DB."""
     urlrec = URLRecord.objects.get(id=url_id)
     headers = {"User-Agent": USER_AGENT}
     resp = requests.get(url, headers=headers, timeout=15)

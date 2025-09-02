@@ -7,18 +7,15 @@ from django.conf import settings
 from django.utils import timezone
 from django.db.models import Q
 
-
 # Configure REDIS_URL in Django settings
 REDIS_KEY = getattr(settings, 'CRAWLER_REDIS_QUEUE_KEY', 'crawler:queue')
 REDIS_URL = getattr(settings, 'CRAWLER_REDIS_URL', 'redis://localhost:6379/0')
-
 
 class Command(BaseCommand):
     help = 'Dispatcher: push pending URLs into Redis queue in batches'
 
     def add_arguments(self, parser):
         parser.add_argument('--batch', type=int, default=50)
-
 
     def handle(self, *args, **options):
         batch = options['batch']
