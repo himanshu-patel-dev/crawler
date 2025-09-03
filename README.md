@@ -39,6 +39,41 @@ This project is a Django-based web crawler service with REST API endpoints, asyn
 ![Pages fetched](images/pages_dashboard.png)
 
 
+## For Future Extensibility (design to crawl billions of URLs)
+
+#### Orchestration
+- Ingestion service, which read URL lists from CSV/DB and push to Kafka (seed-urls).
+- Scheduler / URL frontier consume fro kafka and dedupe, filter for robots.txt and enqueu items in per-host partitions queues.
+- Config service, which keep record of robotx.txt, crawl delay per domain, user agents, if permitted then JS rendering allowed. max depth to crawl.
+- Check for malicious URL or URL web attacks.
+- Orchestrator to auto scale fetch pool workers.
+
+#### Data Fetch
+- stateless workers, pull from frontier, fetch, parse, classify and write data.
+- JS fetcher / headless browser for domain which have dynamic content.
+- Dedup service, reject already saved content based on hash of content.
+- Storage - Raw Content in S3, Metadata/indexes in OLTP/psql, OLTP/lake for analytics.
+
+#### Observability
+- Prometheus + Grafana for metrics
+- Kafka UI
+- Flower/Celery Dashboard for task health
+
+#### Cost/Performance
+- Workers to fetch data are auto scaled up and down.
+- Compess data before storage if we don't need to query it.
+- Maintain data in hot and cold tiers.
+- Async processing in fetch workers to parallelize load.
+- DNS catch.
+- URL idempotency, repeated fetch compare hash of content and don't duplicate data.
+- Dead Letter topics for poison/malacious URLs.
+
+#### SLA and SLO
+- Maintain Crawl completion rate - Like 90% completion rate, out of all the URL loaded in queue.
+- Freshness Lag - when was the last time the content for a page was fetched. Like P90 < 24h.
+- Availability - metadata in OLTP in < 5 min lag. In S3 withing 15 min lag.
+- Monitoring core services - frontier, kafka, fetcher, classifier delay.
+
 # For Author
 These are just notes for author himself. and for more advanced users.
 
