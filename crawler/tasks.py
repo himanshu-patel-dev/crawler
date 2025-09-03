@@ -29,7 +29,7 @@ def fetch_url_task(self, url_id, url):
         wait_for_domain(domain)  # respect crawl delay
 
         # fetch the URL
-        resp = requests.get(url, headers=headers, timeout=15)
+        resp = requests.get(url, headers=headers, timeout=60)
         resp.raise_for_status()
 
         # extract content
