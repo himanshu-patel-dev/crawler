@@ -10,11 +10,12 @@ def extract_basic(html: str, url: str) -> Tuple[str, str, str, List[str]]:
 
     # Title heuristics
     title = ''
+    h1 = None
     if soup.title and soup.title.string:
         title = soup.title.string.strip()
         h1 = soup.find('h1')
     if h1 and h1.get_text(strip=True):
-        # prefer h1 if it's meaningful
+        # prefer h1 if title not present
         title = h1.get_text(strip=True)
 
     # Meta description

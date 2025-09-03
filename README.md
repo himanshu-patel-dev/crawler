@@ -1,4 +1,4 @@
-# crawler
+# web crawler
 a simple web crawler
 
 ## How to insert URLs from Django shell
