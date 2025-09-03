@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from crawler.models import URLRecord
 from crawler.tasks import fetch_url_task
+from crawler.robots import can_fetch
 import redis
 import json
 import time
@@ -36,6 +37,16 @@ class Command(BaseCommand):
             )
 
             for urlrec in url_batch:
+                # check robots.txt
+                if not can_fetch(urlrec.url):
+                    urlrec.status = URLRecord.STATUS_FAILED
+                    urlrec.last_error = "Blocked by robots.txt"
+                    # so we don't retry failed task again, max retry
+                    # ideally should be a separate status
+                    urlrec.retries = 5
+                    urlrec.save()
+
+                # dispatch to celery task queue
                 fetch_url_task.apply_async(
                     args=[urlrec.id, urlrec.url],
                     queue="crawler"

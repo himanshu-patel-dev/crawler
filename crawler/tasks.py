@@ -5,6 +5,8 @@ from crawler.models import URLRecord, Page
 from crawler.extractor import extract_basic
 from crawler.classifier import classify_page, extract_topics
 from crawler.utils import content_hash
+from urllib.parse import urlparse
+from crawler.robots import wait_for_domain
 
 # USER_AGENT = "MyCrawlerBot/1.0 (+https://example.com/bot)"
 MAX_RETRIES = 3  # max retries stored in DB or use a fixed number
@@ -24,10 +26,16 @@ def fetch_url_task(self, url_id, url):
     # headers = {"User-Agent": USER_AGENT}
 
     try:
+        domain = urlparse(url).netloc
+        wait_for_domain(domain)  # respect crawl delay
+
+        # fetch the URL
         resp = requests.get(url, headers=headers, timeout=15)
         resp.raise_for_status()
 
+        # extract content
         title, desc, text, links = extract_basic(resp.text, url)
+        # generate hash of content
         c_hash = content_hash((title or '') + (desc or '') + (text or ''))
 
         Page.objects.update_or_create(

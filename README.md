@@ -1,18 +1,46 @@
 # web crawler
-a simple web crawler
+This project is a Django-based web crawler service with REST API endpoints, asynchronous task processing (Celery), and PostgreSQL for persistent storage. It supports distributed crawling, URL queueing, and metadata extraction.
 
-## How to insert URLs from Django shell
+# Architecture Diagram
+![Architecture Diagram](images/crawler_arch_diagram.png)
 
-```bash
-python3 manage.py shell
-```
-```python
-from crawler.models import URLRecord
+## How to setup project in local
 
-URLRecord.objects.create(url="http://www.amazon.com/Cuisinart-CPT-122-Compact-2-Slice-Toaster/dp/B009GQ034C/")
-URLRecord.objects.create(url="http://blog.rei.com/camp/how-to-introduce-your-indoorsy-friend-to-the-outdoors/")
-URLRecord.objects.create(url="http://www.cnn.com/2013/06/10/politics/edward-snowden-profile/")
-```
+- clone the repo
+- install docker and docker compose
+- run project `docker compose up`
+- access the dashboards as shown in screenshot below
+
+#### Dashboard
+- http://127.0.0.1:80/api/urls/ - post new URL and this will be picked up by dispatcher
+
+![URL POST API](images/url_post_api.png)
+
+- http://127.0.0.1:80/api/urls/list/ - show all URLs along with their status
+
+![URL GET API](images/url_get_api.png)
+
+- http://localhost:5555/ - dashboard for celery task workers
+
+![Celery Dashboard](images/celery_dashboard.png)
+
+- http://127.0.0.1:80/admin/ - admin dashboard
+
+![Admin Dashboard](images/admin_dashboard.png)
+
+- http://127.0.0.1:80/admin/crawler/page/5/change/ - admin page to view crawled page
+![alt text](images/crawled_page.png)
+
+
+## Steps to use
+- insert a URL to crawl in http://127.0.0.1:80/api/urls/. And it will be auto picked up.
+- See the admin dashboard for progress http://127.0.0.1:80/admin/ (username: 'admin', password: 'pass')
+![URLs in progress](images/urls_dashboard.png)
+![Pages fetched](images/pages_dashboard.png)
+
+
+# For Author
+These are just notes for author himself. and for more advanced users.
 
 ## Manually run workers to queue URLs or clean dead/stuck URLs
 
@@ -32,29 +60,3 @@ celery -A crawler_service worker -l info -Q crawler
 celery -A crawler_service flower --port=5555
 
 ```
-
-## Links
-
-#### API Endpoints
-- `http://127.0.0.1:8000/api/urls/` - post new URL and this will be picked up by dispatcher
-
-![URL POST API](images/url_post_api.png)
-
-- `http://127.0.0.1:8000/api/urls/list/` - show all URLs along with their status
-
-![URL GET API](images/url_get_api.png)
-
-- `http://localhost:5555/` - dashboard for celery task workers
-
-![Celery Dashboard](images/celery_dashboard.png)
-
-- `http://127.0.0.1:8000/admin/` - admin dashboard
-
-![Admin Dashboard](images/admin_dashboard.png)
-
-- `http://127.0.0.1:8000/admin/crawler/page/5/change/` - admin page to view crawled page
-![alt text](images/crawled_page.png)
-
-## ToDo
-- Check query access patterns and Indexes
-
